@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daniel's Vulnerable Demo App</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Daniel's Vulnerable Demo App</h1>
+        <p>This app intentionally contains insecure patterns for DevSecOps testing.</p>
+
+        <ul class="links">
+            <li><a href="/ssrf?url=http://localhost:3000/dangerous.html">SSRF Demo</a></li>
+            <li><a href="/cmd?cmd=whoami">Command Execution Demo</a></li>
+            <li><a href="/xss?name=<script>alert('YOU ARE VULNERABLE!')</script>">XSS Demo</a></li>
+            <li><a href="/redirect?next=https://google.com">Open Redirect Demo</a></li>
+            <li><a href="/read?file=app.js">Path Traversal Demo</a></li>
+            <li><a href="/token">Weak JWT Demo</a></li>
+            <li><a href="/leak?secret=superpassword">Sensitive Data Exposure</a></li>
+        </ul>
+    </div>
+</body>
+</html>
