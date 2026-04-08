@@ -80,25 +80,24 @@ pipeline {
             }
         }
 
-        stage('ZAP Baseline Scan') {
+        stage('ZAP Full Scan') {
             steps {
                 sh '''
-                echo "Running ZAP baseline scan..."
-                docker run \
-                    -v $(pwd):/zap/wrk \
-                    -u root \
-                    zaproxy/zap-stable zap.sh \
-                    -cmd \
-                    -quickurl http://host.docker.internal:3000 \
-                    -quickout /zap/wrk/zap-report.html || true
+                docker run -u root -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
+                    -t http://host.docker.internal:3000 \
+                    -r zap-report.html \
+                    -x zap-report.xml \
+                    -I
                 '''
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'zap-report.*', allowEmptyArchive: true
                 }
             }
         }
     }
-
 }
+    
+
+
