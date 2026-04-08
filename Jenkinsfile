@@ -107,11 +107,9 @@ pipeline {
                 }
             }
         }
-    }
 
-    post {
-        always {
-            node {
+        stage('Cleanup') {
+            steps {
                 sh '''
                 echo "Cleaning up containers..."
                 docker stop d-vul-app || true
@@ -120,4 +118,5 @@ pipeline {
             }
         }
     }
+
 }
