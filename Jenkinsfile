@@ -6,6 +6,18 @@ pipeline {
         IMAGE_NAME = "daniels-vulnerable-app"
     }
 
+    post {
+        always {
+            script {
+                sh '''
+                echo "Cleaning up containers..."
+                docker stop d-vul-app || true
+                docker rm d-vul-app || true
+                '''
+            }
+        }
+    }
+
     stages {
 
         stage('Checkout') {
@@ -57,8 +69,12 @@ pipeline {
         stage('Run App Container') {
             steps {
                 sh '''
+                echo "Removing standing app containers..."
+                docker stop d-vul-app || true
+                docker rm d-vul-app || true
+
                 echo "Starting app container..."
-                docker run -d --name d-vul-app -p 3000:3000 ${IMAGE_NAME}
+                docker run -d --name d-vul-app -p 3000:3000 daniels-vulnerable-app
                 sleep 5
                 '''
             }
@@ -85,15 +101,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            script {
-                sh '''
-                echo "Cleaning up containers..."
-                docker stop d-vul-app || true
-                docker rm d-vul-app || true
-                '''
-            }
-        }
-    }
 }
