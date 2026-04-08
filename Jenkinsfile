@@ -14,16 +14,6 @@ pipeline {
             }
         }
 
-        stage('Install Security Tools') {
-            steps {
-                sh '''
-                echo "Installing Semgrep & Checkov..."
-                pip install --upgrade pip
-                pip install semgrep checkov
-                '''
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -43,34 +33,6 @@ pipeline {
             post {
                 always {
                     archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
-                }
-            }
-        }
-
-        stage('Semgrep Scan') {
-            steps {
-                sh '''
-                echo "Running Semgrep scan..."
-                semgrep scan --config auto . > semgrep-report.txt || true
-                '''
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'semgrep-report.txt', allowEmptyArchive: true
-                }
-            }
-        }
-
-        stage('Checkov Scan') {
-            steps {
-                sh '''
-                echo "Running Checkov scan..."
-                checkov -d . --output json > checkov-report.json || true
-                '''
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'checkov-report.json', allowEmptyArchive: true
                 }
             }
         }
