@@ -14,6 +14,16 @@ pipeline {
             }
         }
 
+        stage('Install Security Tools') {
+            steps {
+                sh '''
+                echo "Installing Semgrep & Checkov..."
+                pip install --upgrade pip
+                pip install semgrep checkov
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -32,7 +42,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'trivy-report.txt'
+                    archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
                 }
             }
         }
@@ -46,7 +56,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'semgrep-report.txt'
+                    archiveArtifacts artifacts: 'semgrep-report.txt', allowEmptyArchive: true
                 }
             }
         }
@@ -60,7 +70,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'checkov-report.json'
+                    archiveArtifacts artifacts: 'checkov-report.json', allowEmptyArchive: true
                 }
             }
         }
@@ -68,7 +78,7 @@ pipeline {
         stage('Gitleaks Scan') {
             steps {
                 sh '''
-                echo "Running Gitleaks scan (Docker)..."
+                echo "Running Gitleaks scan..."
                 docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect \
                     --source=/path \
                     --report-path=/path/gitleaks-report.json \
@@ -77,7 +87,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'gitleaks-report.json'
+                    archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
                 }
             }
         }
@@ -95,21 +105,27 @@ pipeline {
         stage('ZAP Baseline Scan') {
             steps {
                 sh '''
-                echo "Running ZAP baseline scan (Docker)..."
-                docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap.sh \
-                    -cmd -quickurl http://host.docker.internal:3000 \
+                echo "Running ZAP baseline scan..."
+                docker run \
+                    -v $(pwd):/zap/wrk \
+                    -u root \
+                    zaproxy/zap-stable zap.sh \
+                    -cmd \
+                    -quickurl http://host.docker.internal:3000 \
                     -quickout /zap/wrk/zap-report.html || true
                 '''
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'zap-report.html'
+                    archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
                 }
             }
         }
+    }
 
-        stage('Cleanup') {
-            steps {
+    post {
+        always {
+            script {
                 sh '''
                 echo "Cleaning up containers..."
                 docker stop d-vul-app || true
@@ -118,5 +134,4 @@ pipeline {
             }
         }
     }
-
 }
