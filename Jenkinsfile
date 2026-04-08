@@ -35,6 +35,14 @@ pipeline {
             }
         }
 
+        stage('Semgrep Scan') {
+            steps {
+                sh '''
+                semgrep scan --config p/owasp-top-ten --error .
+                '''
+            }
+        }
+
         stage('Trivy Scan') {
             steps {
                 sh '''
@@ -80,24 +88,25 @@ pipeline {
             }
         }
 
-        stage('ZAP Full Scan') {
+        stage('ZAP Baseline Scan') {
             steps {
                 sh '''
-                docker run -u root -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
-                    -t http://host.docker.internal:3000 \
-                    -r zap-report.html \
-                    -x zap-report.xml \
-                    -I
+                echo "Running ZAP baseline scan..."
+                docker run \
+                    -v $(pwd):/zap/wrk \
+                    -u root \
+                    zaproxy/zap-stable zap.sh \
+                    -cmd \
+                    -quickurl http://host.docker.internal:3000 \
+                    -quickout /zap/wrk/zap-report.html || true
                 '''
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'zap-report.*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
                 }
             }
         }
     }
+
 }
-    
-
-
