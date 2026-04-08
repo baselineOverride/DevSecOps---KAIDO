@@ -110,13 +110,13 @@ pipeline {
     }
 
     post {
-    always {
-        node {
-            sh '''
-            echo "Cleaning up containers..."
-            docker stop d-vul-app || true
-            docker rm d-vul-app || true
-            '''
+        always {
+            node {
+                sh '''
+                echo "Cleaning up containers..."
+                docker stop d-vul-app || true
+                docker rm d-vul-app || true
+                '''
             }
         }
     }
