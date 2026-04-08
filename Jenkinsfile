@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "daniel's-vulnerable-app"
-        IMAGE_NAME = "daniel's-vulnerable-app"
+        APP_NAME = "daniels-vulnerable-app"
+        IMAGE_NAME = "daniels-vulnerable-app"
     }
 
     stages {
