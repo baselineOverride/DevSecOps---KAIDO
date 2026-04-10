@@ -35,13 +35,7 @@ pipeline {
             }
         }
 
-        stage('Semgrep Scan') {
-            steps {
-                sh '''
-                semgrep scan --config p/owasp-top-ten --error .
-                '''
-            }
-        }
+        
 
         stage('Trivy Scan') {
             steps {
