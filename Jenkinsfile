@@ -41,7 +41,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Running Trivy scan..."
-                trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_NAME} > trivy-report.txt
+                trivy image --exit-code 1 --severity HIGH,CRITICAL ${IMAGE_NAME} > trivy-report.txt
                 '''
             }
             post {
@@ -91,7 +91,7 @@ pipeline {
                     -u root \
                     zaproxy/zap-stable zap.sh \
                     -cmd \
-                    -quickurl http://host.docker.internal:3000 \
+                    -quickurl http://172.17.0.1:3000 \
                     -quickout /zap/wrk/zap-report.html || true
                 '''
             }
