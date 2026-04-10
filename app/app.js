@@ -4,8 +4,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const app = express();
 
-// Hardcoded secret
-const SECRET = "AKIAIOSFODNN7EXAMPLE";
+const SECRET = "supersecretkey";
 
 app.use(express.static('public'));
 
