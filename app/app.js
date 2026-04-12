@@ -37,21 +37,32 @@ app.get('/xss', (req, res) => {
 // Fix for Open Redirect: Validate the redirect URL
 app.get('/redirect', (req, res) => {
     const next = req.query.next;
-    const allowed = ["https://google.com", "https://example.com"];
+    try {
+        const url = new URL(next);
 
-    if (!allowed.includes(next)) {
-        return res.status(400).send("Invalid redirect target");
+        const allowedHosts = [
+            "google.com",
+            "example.com"
+        ];
+
+        if (!allowedHosts.includes(url.hostname)) {
+            return res.status(400).send("Invalid redirect target");
+        }
+
+        return res.redirect(url.toString());
+    } catch (err) {
+        return res.status(400).send("Invalid URL format");
     }
-
-    res.redirect(next);
 });
 
 // Fix for Path Traversal: Sanitize the file path and restrict to a specific directory
 app.get('/read', (req, res) => {
     const file = sanitize(req.query.file || "");
-    const safePath = path.join(__dirname, "public", file);
 
-    if (!safePath.startsWith(path.join(__dirname, "public"))) {
+    const baseDir = path.join(__dirname, "public");
+    const safePath = path.join(baseDir, file);
+
+    if (!safePath.startsWith(baseDir)) {
         return res.status(400).send("Invalid file path");
     }
 
