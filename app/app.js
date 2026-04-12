@@ -1,64 +1,72 @@
 const express = require('express');
 const axios = require('axios');
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const sanitize = require('sanitize-html');
+const path = require('path');
+
 const app = express();
 
-const SECRET = "supersecretkey";
+const SECRET = process.env.JWT_SECRET || "fallback-secret";
 
 app.use(express.static('public'));
+app.use(helmet());
 
-// SSRF 
+// Fix for SSRF: Sanitize the URL before making the request
 app.get('/ssrf', async (req, res) => {
-    const url = req.query.url;
     try {
-        const response = await axios.get(url);
-        res.send(response.data);
+    const response = await axios.get("https://api.github.com");
+        const clean = sanitize(JSON.stringify(response.data));
+        res.send(`<pre>${clean}</pre>`);
     } catch (err) {
-        res.send("SSRF request failed");
+        res.status(500).send("Error fetching data");
     }
 });
 
-// Command Execution
+// Fix for Command Injection: Do not execute user input as commands
 app.get('/cmd', (req, res) => {
-    const { exec } = require('child_process');
-    exec(req.query.cmd, (err, stdout) => {
-        res.send(stdout || "Error executing command");
-    });
+    res.send("Command execution disabled for security.");
 });
 
-// Reflected XSS
+// Fix for Reflected XSS: Sanitize user input
 app.get('/xss', (req, res) => {
-    const name = req.query.name;
+    const name = sanitize(req.query.name || "Guest");
     res.send(`<h1>Hello ${name}</h1>`);
 });
 
-// Open Redirect
+// Fix for Open Redirect: Validate the redirect URL
 app.get('/redirect', (req, res) => {
     const next = req.query.next;
+    const allowed = ["https://google.com", "https://example.com"];
+
+    if (!allowed.includes(next)) {
+        return res.status(400).send("Invalid redirect target");
+    }
+
     res.redirect(next);
 });
 
-// Path Traversal
+// Fix for Path Traversal: Sanitize the file path and restrict to a specific directory
 app.get('/read', (req, res) => {
-    const file = req.query.file;
-    fs.readFile(file, 'utf8', (err, data) => {
-        if (err) return res.send("Error reading file");
-        res.send(`<pre>${data}</pre>`);
-    });
+    const file = sanitize(req.query.file || "");
+    const safePath = path.join(__dirname, "public", file);
+
+    if (!safePath.startsWith(path.join(__dirname, "public"))) {
+        return res.status(400).send("Invalid file path");
+    }
+
+    res.sendFile(safePath);
 });
 
-// Weak JWT
+// Fix for Insecure Deserialization: Do not deserialize untrusted data
 app.get('/token', (req, res) => {
-    const token = jwt.sign({ role: "user" }, SECRET);
-    res.send(`Weak token: ${token}`);
+    const token = jwt.sign({ role: "user" }, SECRET, { expiresIn: "1h" });
+    res.json({ token });
 });
 
-// Sensitive Data Exposure
+// Fix for Sensitive Logging: Avoid logging sensitive information
 app.get('/leak', (req, res) => {
-    const secret = req.query.secret;
-    console.log("Leaked secret:", secret); // Logging sensitive data
-    res.send("Secret logged to server console");
+    res.send("Sensitive logging disabled.");
 });
 
 app.listen(3000, () => console.log("Running"));

@@ -11,7 +11,11 @@ resource "aws_vpc" "kaido_main" {
 resource "aws_subnet" "kaido_public" {
   vpc_id                  = aws_vpc.kaido_main.id
   cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false         # Fixed
+
+  tags = {
+    Name = "kaido-public"
+  }
 }
 
 resource "aws_internet_gateway" "kaido_igw" {
@@ -99,6 +103,12 @@ resource "aws_instance" "jenkins" {
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.jenkins_profile.name
 
+  # Fixed
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required" # IMDSv2 only
+  }
+
   tags = {
     Name = "DevSecOps - Kaido"
   }
@@ -106,7 +116,8 @@ resource "aws_instance" "jenkins" {
 
 # ECR repo for banking API image
 resource "aws_ecr_repository" "repo" {
-  name = "devsecops-banking-api"
+  name                 = "devsecops-banking-api"
+  image_tag_mutability = "IMMUTABLE"
 }
 
 # S3 bucket for artifacts

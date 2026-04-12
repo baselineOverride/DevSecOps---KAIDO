@@ -8,9 +8,6 @@ RUN npm install
 
 COPY app .
 
-RUN adduser -D appuser
-USER appuser
-
 EXPOSE 3000
 
 CMD ["node", "app.js"]
