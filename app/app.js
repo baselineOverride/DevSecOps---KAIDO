@@ -68,7 +68,7 @@ app.get('/read', (req, res) => {
             return res.status(400).send("Invalid file path");
         }
 
-        return res.sendFile(resolvedPath);
+        return res.sendFile(resolvedPath, { root: "/" });
     } catch (err) {
         return res.status(400).send("Invalid file path");
     }
