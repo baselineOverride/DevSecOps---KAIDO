@@ -8,7 +8,7 @@ RUN npm install
 
 COPY app .
 
-RUN adduser -D -h /home/appuser appuser
+RUN useradd -m -d /home/appuser appuser
 USER appuser
 
 EXPOSE 3000

@@ -57,16 +57,21 @@ app.get('/redirect', (req, res) => {
 
 // Fix for Path Traversal: Sanitize the file path and restrict to a specific directory
 app.get('/read', (req, res) => {
-    const file = sanitize(req.query.file || "");
+    const file = req.query.file;
 
     const baseDir = path.join(__dirname, "public");
-    const safePath = path.join(baseDir, file);
 
-    if (!safePath.startsWith(baseDir)) {
+    try {
+        const resolvedPath = path.resolve(baseDir, file);
+
+        if (!resolvedPath.startsWith(baseDir)) {
+            return res.status(400).send("Invalid file path");
+        }
+
+        return res.sendFile(resolvedPath);
+    } catch (err) {
         return res.status(400).send("Invalid file path");
     }
-
-    res.sendFile(safePath);
 });
 
 // Fix for Insecure Deserialization: Do not deserialize untrusted data
