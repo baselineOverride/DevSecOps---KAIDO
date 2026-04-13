@@ -60,8 +60,8 @@ Terraform provisions:
 - IAM roles + instance profile  
 - ECR repository  
 
-**📸 Screenshot placeholder:**  
-`/screenshots/terraform-architecture.png`
+**Diagram:**
+![Terraform Diagram](screenshots/Terraform%20Diagram.png)
 
 ---
 
@@ -79,8 +79,8 @@ The pipeline performs:
 8. Archive reports  
 9. Security gate (fail if any scanner reports blocking issues)
 
-**📸 Screenshot placeholder:**  
-`/screenshots/jenkins-pipeline.png`
+**Diagram:**
+![Pipeline Diagram](screenshots/Jenkins%20Pipeline%20Diagram.png)
 
 ---
 
@@ -97,8 +97,8 @@ A deliberately insecure Node.js banking API used to demonstrate:
 - Missing security headers  
 - Dockerfile running as root  
 
-**📸 Screenshot placeholder:**  
-`/screenshots/app-homepage.png`
+**App Front Page:**
+![App](screenshots/App%20Verify.png)
 
 ---
 
@@ -117,8 +117,7 @@ Semgrep scans the source code using the OWASP Top 10 ruleset.
 - Dockerfile running as root  
 - Terraform misconfigurations (public subnet, IMDSv1, mutable ECR tags)
 
-**📸 Screenshot placeholder:**  
-`/screenshots/semgrep-summary.png`
+![Semgrep](screenshots/Semgrep%20Verify.png)
 
 **Report:**  
 `/reports/semgrep.json`
@@ -135,10 +134,10 @@ Trivy scans the Docker image for HIGH/CRITICAL CVEs.
 - OpenSSL CVEs  
 - libc vulnerabilities  
 - Outdated OS packages  
-
+<!--
 **📸 Screenshot placeholder:**  
 `/screenshots/trivy-summary.png`
-
+-->
 **Report:**  
 `/reports/trivy.json`
 
@@ -148,9 +147,10 @@ Trivy scans the Docker image for HIGH/CRITICAL CVEs.
 
 Scans the repository for hardcoded secrets.
 
+<!--
 **📸 Screenshot placeholder:**  
 `/screenshots/gitleaks.png`
-
+-->
 **Report:**  
 `/reports/gitleaks.json`
 
@@ -167,8 +167,13 @@ ZAP attacks the running application.
 - Open redirect  
 - Path traversal indicators  
 
-**Screenshot placeholder:**  
-`/screenshots/zap-report.png`
+**Screenshots:**  
+
+<p align="center">
+  <img src="screenshots/ZAP%20Verify.png" width="1000" />
+  <br></br>
+  <img src="screenshots/ZAP%20Solution%20Example.png" width="1000" /> 
+</p>
 
 **Report:**  
 `/reports/zap-report.html`
@@ -186,8 +191,13 @@ Finished: FAILURE
 
 This demonstrates real DevSecOps governance.
 
-**Screenshot placeholder:**  
-`/screenshots/jenkins-failure.png`
+**Screenshots:**  
+
+<p align="center">
+  <img src="screenshots/Pipeline%20Fail.png" width="1000" />
+  <br></br>
+  <img src="screenshots/Pipeline%20Scan%20Overview.png" width="1000" /> 
+</p>
 
 ---
 
